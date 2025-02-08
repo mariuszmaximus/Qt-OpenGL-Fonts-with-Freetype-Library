@@ -1,4 +1,6 @@
 #include "fontprovider.h"
+#include <QCoreApplication>
+#include <QtCore/qglobal.h>
 
 FontProvider::FontProvider()
 {
@@ -29,6 +31,7 @@ void FontProvider::initFontGeometry() {
 	if (FT_New_Face(ft, fontName, 0, &face))
 	{
 		qDebug() << "ERROR::FREETYPE: Failed to load font\n";
+		QCoreApplication::exit(-1); // -1 oznacza kod błędu
 	}
 	else
 	{
@@ -44,6 +47,7 @@ void FontProvider::initFontGeometry() {
 
 		// Load all glyphs in ttf file
 		while (index) {
+			qDebug() << "index:" <<index;
 			// Load character glyph
 			if (FT_Load_Glyph(face, index, FT_LOAD_RENDER))
 			{
@@ -70,9 +74,11 @@ void FontProvider::initFontGeometry() {
 				text,
 				QVector2D(face->glyph->bitmap.width, face->glyph->bitmap.rows),
 				QVector2D(face->glyph->bitmap_left, face->glyph->bitmap_top),
-				face->glyph->advance.x
+				0 //face->glyph->advance.x
 			};
-				fontCharactersBold.insert(std::pair<FT_ULong, Character>(c, character));
+			character.Advance = face->glyph->advance.x;
+			
+			fontCharactersBold.insert(std::pair<FT_ULong, Character>(c, character));
             text->release();
 			c = FT_Get_Next_Char(face, c, &index);
 		}
@@ -97,7 +103,7 @@ void FontProvider::drawFontGeometry(QOpenGLShaderProgram * programFont, GLfloat 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
-	int nCount = text.count();
+	int nCount = text.size(); 
 	for (int i = 0; i < nCount; i++)
 	{
 		QChar cha = text.at(i);

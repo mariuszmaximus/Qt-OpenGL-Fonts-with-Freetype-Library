@@ -106,9 +106,9 @@ void MainWidget::initializeGL()
     setPerspectiveProjectionMatrix();
     setViewMatrix();
     initShaders();
-    frameTime.start();
+    frameTime = QTime::currentTime();
     frameCount = 0;
-	frameTimeForFontLoad.start();
+	frameTimeForFontLoad= QTime::currentTime();
 
 	QOpenGLContext *current = context();
 	doneCurrent();
@@ -174,11 +174,13 @@ void MainWidget::paintGL()
 #ifdef FLIP_VIEW
 	glViewport(-SCR_WIDTH_OFFSET, -SCR_HEIGHT_OFFSET, (GLsizei)SCR_WIDTH, (GLsizei)SCR_HEIGHT);
 #endif
+	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if (!checkFirstFrameTimeElapsed)
 	{
-		int loadTime = frameTimeForFontLoad.elapsed();
+		int loadTime = frameTimeForFontLoad.msecsTo(QTime::currentTime());
 		checkFirstFrameTimeElapsed = true;
 		qDebug() << "Total load Time for First painGL call" << loadTime << "\n";
 	}
@@ -187,9 +189,9 @@ void MainWidget::paintGL()
 		paintGLHelperForFontRendering();
 
 	++frameCount;
-	if (frameTime.elapsed() >= 1000)
+	if (frameTime.msecsTo(QTime::currentTime()) >= 1000)
 	{
-		fps = frameCount / ((double)frameTime.elapsed() / 1000.0f);
+		fps = frameCount / ((double)frameTime.msecsTo(QTime::currentTime()) / 1000.0f);
         qDebug() << "FPS" << "  " << fps;
 	}
 	update();

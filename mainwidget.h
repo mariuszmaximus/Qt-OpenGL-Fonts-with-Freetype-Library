@@ -17,8 +17,8 @@
 #include <QDebug>
 #include <QByteArray>
 
-#define NO_FLIP_VIEW
-//#define FLIP_VIEW
+// #define NO_FLIP_VIEW
+// #define FLIP_VIEW
 
 
 const unsigned int SCR_WIDTH_OFFSET = 125;
